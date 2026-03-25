@@ -49,7 +49,7 @@ Then run
 
   - [x] `3XNN` skip if `VX == NN`
   - [x] `4XNN` skip if `VX != NN`
-  - [ ] `5XY0` skip if `VX == VY`
+  - [x] `5XY0` skip if `VX == VY`
 
   - [x] `6XNN` set register `VX`
   - [x] `7XNN` add value to register `VX`
