@@ -36,6 +36,7 @@ Then run
 - [x] Implement a Chip8 interfcae
 - [x] Handle graphics
 - [ ] Implement Keypad
+- [ ] Sound Support
 - [x] Add and Load Fonts
 - [x] Implement Timers
 - [x] Decode Instruction
