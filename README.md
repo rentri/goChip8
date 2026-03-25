@@ -46,8 +46,8 @@ Then run
   - [x] `1NNN` jump
   - [x] `2NNN` call subroutine
 
-  - [ ] `3XNN` skip if `VX == NN`
-  - [ ] `4XNN` skip if `VX != NN`
+  - [x] `3XNN` skip if `VX == NN`
+  - [x] `4XNN` skip if `VX != NN`
   - [ ] `5XY0` skip if `VX == VY`
 
   - [x] `6XNN` set register `VX`
