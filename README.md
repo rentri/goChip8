@@ -1,4 +1,4 @@
-# A chip8 emulator in Golang
+# A chip8 emulator written in Golang
 
 
 ## Running the emulator
