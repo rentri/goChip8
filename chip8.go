@@ -146,7 +146,7 @@ func (chip *Chip8) decodeAndExecute() {
 	// 4XNN
 	// 5XY0
 	case 0x5000: // 5XY0
-		chip.nextInstructionIfEqual(X, Y)
+		chip.skipIfEqualReg(X, Y)
 	case 0x6000: // 6XNN
 		// LD VX, byte
 		chip.ldByte(X, NN)
@@ -220,7 +220,7 @@ func (chip *Chip8) skipIfNotEqual(X, NN uint16) {
 
 // SE Vx, Vy
 // if Vx = Vy then increment PC
-func (chip *Chip8) nextInstructionIfEqual(X, Y) { 
+func (chip *Chip8) skipIfEqualReg(X, Y uint16) { 
 	if chip.V[X] == chip.V[Y] {
 		chip.PC += 2
 	}
