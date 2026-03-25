@@ -142,16 +142,18 @@ func (chip *Chip8) decodeAndExecute() {
 		// SNE VX, byte
 		chip.skipIfNotEqual(X, NN)
 
-	// 3XNN
-	// 4XNN
-	// 5XY0
 	case 0x5000: // 5XY0
+		// SE VX, VY
 		chip.skipIfEqualReg(X, Y)
+
 	case 0x6000: // 6XNN
 		// LD VX, byte
 		chip.ldByte(X, NN)
+
 	case 0x7000: // 7XNN
+		// ADD VX, byte
 		chip.addByte(X, NN)
+
 	// TODO: 8XY0
 	// 8XY1
 	// 8XY2
@@ -162,11 +164,14 @@ func (chip *Chip8) decodeAndExecute() {
 	// 8XY7
 	// 8XYE
 	// 9XY0
+	//
 	case 0xA000: // ANNN
 		// LD I, addr
 		chip.ldAddr(NNN)
+
 	// TODO: BNNN
 	// CXNN
+	//
 	case 0xD000: // DXYN
 		// DRW VX, VY, nibble
 		chip.drw(X, Y, N)
@@ -220,7 +225,7 @@ func (chip *Chip8) skipIfNotEqual(X, NN uint16) {
 
 // SE Vx, Vy
 // if Vx = Vy then increment PC
-func (chip *Chip8) skipIfEqualReg(X, Y uint16) { 
+func (chip *Chip8) skipIfEqualReg(X, Y uint16) {
 	if chip.V[X] == chip.V[Y] {
 		chip.PC += 2
 	}
