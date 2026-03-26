@@ -11,6 +11,30 @@ type Display struct {
 	scale int
 }
 
+// keymap for keypad.go
+// TODO: implemet scancodes for different keyboard layouts
+var keyMap = map[ebiten.Key]uint8{
+	ebiten.Key1: 0x1,
+	ebiten.Key2: 0x2,
+	ebiten.Key3: 0x3,
+	ebiten.Key4: 0xC,
+
+	ebiten.KeyQ: 0x4,
+	ebiten.KeyW: 0x5,
+	ebiten.KeyE: 0x6,
+	ebiten.KeyR: 0xD,
+
+	ebiten.KeyA: 0x7,
+	ebiten.KeyS: 0x8,
+	ebiten.KeyD: 0x9,
+	ebiten.KeyF: 0xE,
+
+	ebiten.KeyZ: 0xA,
+	ebiten.KeyX: 0x0,
+	ebiten.KeyC: 0xB,
+	ebiten.KeyV: 0xF,
+}
+
 func NewDisplay(chip *Chip8, scale int) *Display {
 	return &Display{
 		chip:  chip,
@@ -19,6 +43,13 @@ func NewDisplay(chip *Chip8, scale int) *Display {
 }
 
 func (display *Display) Update() error {
+	for key, chipKey := range keyMap {
+		if ebiten.IsKeyPressed(key) {
+			display.chip.keypad.Press(chipKey)
+		} else {
+			display.chip.keypad.Release(chipKey)
+		}
+	}
 	// ebiten runs at 60 fps, cpu cycle will run at 720 (60*12) Hz
 	// roughly 700 instruction per second
 	for i := 0; i < 12; i++ {

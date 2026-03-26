@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 )
 
 // chip 8 programs start at location 0x200 (512)
@@ -23,7 +25,8 @@ type Chip8 struct {
 	gfx    [ScreenWidth * ScreenHeight]byte // 64x32 display
 	DT     byte                             // delay timer register
 	ST     byte                             // sound timer register
-	keys   [16]byte                         // keypad has 16 keys
+	keypad *Keypad                          // keypad has 16 keys
+	rng    *rand.Rand                       // rng for each instance of Chip8 used for CXNN instruction
 }
 
 var chip8Font = [80]byte{
@@ -48,6 +51,10 @@ var chip8Font = [80]byte{
 func NewChip() (chip *Chip8) {
 	chip = &Chip8{}
 	chip.PC = startAddress
+
+	// seed rng with current time , seed is time elapsed since unix posix time
+	chip.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	// load fonts
 	copy(chip.memory[0x050:0x09F], chip8Font[:])
 	return
@@ -154,7 +161,8 @@ func (chip *Chip8) decodeAndExecute() {
 		// ADD VX, byte
 		chip.addByte(X, NN)
 
-	case 0x8000: // 8XY0, 8XY1, 8XY2, 8XY3
+	case 0x8000: // 8XY0, 8XY1, 8XY2, 8XY3, 8XY4,
+		// 8XY5, 8XY6, 8XY7, 8XYE
 
 		switch N {
 		case 0x0:
@@ -169,24 +177,52 @@ func (chip *Chip8) decodeAndExecute() {
 		case 0x3:
 			// XOR VX, VY
 			chip.xorReg(X, Y)
-		}	
-	// 8XY4
-	// 8XY5
-	// 8XY6
-	// 8XY7
-	// 8XYE
-	// 9XY0
-	//
+		case 0x4:
+			// ADD VX, VY
+			chip.addReg(X, Y)
+		case 0x5:
+			// SUB VX, VY
+			chip.subReg(X, Y)
+		case 0x6:
+			// SHR VX
+			chip.shiftRight(X)
+		case 0x7:
+			// SUBN VX, VY
+			chip.subNReg(X, Y)
+		case 0xE:
+			// SHL VX
+			chip.shiftLeftReg(X)
+		}
+
+	case 0x9000: // 9XY0
+		// SNE VX, VY
+		chip.skipIfNotEqualReg(X, Y)
+
 	case 0xA000: // ANNN
 		// LD I, addr
 		chip.ldAddr(NNN)
 
-	// TODO: BNNN
-	// CXNN
-	//
+	case 0xB000: // BNNN
+		// JP V0, addr
+		chip.jpWithOffset(NNN)
+
+	case 0xC000: // CXNN
+		// RND VX, byte
+		chip.randAndByte(X, NN)
+
 	case 0xD000: // DXYN
 		// DRW VX, VY, nibble
 		chip.drw(X, Y, N)
+
+	case 0xE000: // EX9E, EXA1
+
+		switch NN {
+		case 0x9E:
+			// SKP VX
+			chip.skipIfKeyReg(X)
+			// case 0xA1:
+			// SKNP VX
+		}
 	}
 }
 
@@ -279,13 +315,100 @@ func (chip *Chip8) xorReg(X, Y uint16) {
 	chip.V[X] ^= chip.V[Y]
 }
 
+// ADD VX, VY
+// set VX = VX + VY, set VF = carry
+func (chip *Chip8) addReg(X, Y uint16) {
+	sum := uint16(chip.V[X]) + uint16(chip.V[Y])
+	if sum > 255 {
+		chip.V[0xF] = 1 // carry
+	} else {
+		chip.V[0xF] = 0
+	}
+
+	chip.V[X] = uint8(sum)
+}
+
+// SUB VX, VY
+// set VX = VX - VY, set VF = !borrow
+func (chip *Chip8) subReg(X, Y uint16) {
+	if chip.V[X] > chip.V[Y] {
+		chip.V[0xF] = 1
+	} else {
+		chip.V[0xF] = 0 // borrow
+	}
+
+	// we are using the byte type which is uint8 under the hood
+	// uint8 IS expected to wrap around if VX - VY goes negative
+	// VF already set
+	chip.V[X] -= chip.V[Y]
+}
+
+// SHR VX
+// division by 2
+func (chip *Chip8) shiftRight(X uint16) {
+	// set VF to LSB of VX
+	chip.V[0xF] = chip.V[X] & 0x1
+
+	// division by 2
+	chip.V[X] >>= 1
+}
+
+// SUBN VX, VY
+// set VX = VY - VX
+func (chip *Chip8) subNReg(X, Y uint16) {
+	if chip.V[Y] > chip.V[X] {
+		chip.V[0xF] = 1
+	} else {
+		chip.V[0xF] = 0
+	}
+
+	chip.V[X] = chip.V[Y] - chip.V[X]
+}
+
+// SHL VX
+// multiplication by 2
+func (chip *Chip8) shiftLeftReg(X uint16) {
+	// set VF to MSB of VX
+	chip.V[0xF] = chip.V[X] & 0x8
+
+	// multiplication by 2
+	chip.V[X] <<= 1
+}
+
+// SNE VX, VY
+// if VX != VY then increment PC
+func (chip *Chip8) skipIfNotEqualReg(X, Y uint16) {
+	if chip.V[X] != chip.V[Y] {
+		chip.PC += 2
+	}
+}
+
 // LD I, addr
 // set I = NNN
 func (chip *Chip8) ldAddr(NNN uint16) {
 	chip.I = NNN
 }
 
-// TODO...
+// JP V0, addr
+// set PC = NNN + V0
+func (chip *Chip8) jpWithOffset(NNN uint16) {
+	chip.PC = uint16(chip.V[0]) + uint16(NNN)
+}
+
+// helper function for mehtod randAndByte
+func (chip *Chip8) randByte() byte {
+	// could not find what type of PRNG the early chip8 systems used
+	// each system such as the COSMIC VIP and the HP-48 calculators
+	// used their own PRNG implementation
+	// return a pseudo random number <= 255
+	return byte(chip.rng.Intn(256))
+}
+
+// RND VX, byte
+// set VX = random byte & NN
+func (chip *Chip8) randAndByte(X, NN uint16) {
+	chip.V[X] = chip.randByte() & byte(NN)
+}
 
 // DRW VX, VY, nibble
 // display nbyte sprite starting at memory location I at (VX, VY)
@@ -328,3 +451,13 @@ func (chip *Chip8) drw(X, Y, N uint16) {
 		}
 	}
 }
+
+// SKP VX
+// if key with value VX is pressed then increment pc
+func (chip *Chip8) skipIfKeyReg(X uint16) {
+	if chip.keypad.IsPressed(chip.V[X]) {
+		chip.PC += 2
+	}
+}
+
+//
