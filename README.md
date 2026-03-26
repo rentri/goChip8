@@ -35,7 +35,8 @@ Then run
 
 - [x] Implement a Chip8 interfcae
 - [x] Handle graphics
-- [ ] Implement Keypad
+- [x] Implement Keypad
+  - Implement Scancodes
 - [ ] Sound Support
 - [x] Add and Load Fonts
 - [x] Implement Timers
@@ -54,26 +55,26 @@ Then run
   - [x] `6XNN` set register `VX`
   - [x] `7XNN` add value to register `VX`
 
-  - [ ] `8XY0` set `VX = VY`
-  - [ ] `8XY1` set `VX = VX OR VY`
-  - [ ] `8XY2` set `VX = VX AND VY`
-  - [ ] `8XY3` set `VX = VX XOR VY`
-  - [ ] `8XY4` add `VY` to `VX` (set VF = carry)
-  - [ ] `8XY5` subtract `VY` from `VX` (set VF = NOT borrow)
-  - [ ] `8XY6` shift `VX` right (VF = LSB)
-  - [ ] `8XY7` set `VX = VY - VX` (set VF = NOT borrow)
-  - [ ] `8XYE` shift `VX` left (VF = MSB)
+  - [x] `8XY0` set `VX = VY`
+  - [x] `8XY1` set `VX = VX OR VY`
+  - [x] `8XY2` set `VX = VX AND VY`
+  - [x] `8XY3` set `VX = VX XOR VY`
+  - [x] `8XY4` add `VY` to `VX` (set VF = carry)
+  - [x] `8XY5` subtract `VY` from `VX` (set VF = NOT borrow)
+  - [x] `8XY6` shift `VX` right (VF = LSB)
+  - [x] `8XY7` set `VX = VY - VX` (set VF = NOT borrow)
+  - [x] `8XYE` shift `VX` left (VF = MSB)
 
-  - [ ] `9XY0` skip if `VX != VY`
+  - [x] `9XY0` skip if `VX != VY`
 
   - [x] `ANNN` set index register `I`
-  - [ ] `BNNN` jump to `NNN + V0`
+  - [x] `BNNN` jump to `NNN + V0`
 
-  - [ ] `CXNN` set `VX = random AND NN`
+  - [x] `CXNN` set `VX = random AND NN`
 
   - [x] `DXYN` draw
 
-  - [ ] `EX9E` skip if key in `VX` is pressed
+  - [x] `EX9E` skip if key in `VX` is pressed
   - [ ] `EXA1` skip if key in `VX` is NOT pressed
 
   - [ ] `FX07` set `VX = delay timer`
