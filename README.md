@@ -32,6 +32,7 @@ Then run
 
 
 ## TODO
+<details>
 
 - [x] Implement a Chip8 interfcae
 - [x] Handle graphics
@@ -41,7 +42,7 @@ Then run
 - [x] Add and Load Fonts
 - [x] Implement Timers
 - [x] Decode Instruction
-- [x] Implement instructions
+- [ ] Implement instructions
   - [x] `00E0` clear screen
   - [x] `00EE` return from subroutine
 
@@ -75,10 +76,10 @@ Then run
   - [x] `DXYN` draw
 
   - [x] `EX9E` skip if key in `VX` is pressed
-  - [ ] `EXA1` skip if key in `VX` is NOT pressed
+  - [x] `EXA1` skip if key in `VX` is NOT pressed
 
-  - [ ] `FX07` set `VX = delay timer`
-  - [ ] `FX0A` wait for key press, store in `VX`
+  - [x] `FX07` set `VX = delay timer`
+  - [x] `FX0A` wait for key press, store in `VX`
   - [ ] `FX15` set delay timer = `VX`
   - [ ] `FX18` set sound timer = `VX`
   - [ ] `FX1E` add `VX` to `I`
@@ -86,6 +87,7 @@ Then run
   - [ ] `FX33` store BCD of `VX` in memory
   - [ ] `FX55` store registers `V0` to `VX` in memory
   - [ ] `FX65` load registers `V0` to `VX` from memory
+</details>
 
 # Resources
 http://devernay.free.fr/hacks/chip8/C8TECH10.HTM

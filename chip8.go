@@ -219,9 +219,24 @@ func (chip *Chip8) decodeAndExecute() {
 		switch NN {
 		case 0x9E:
 			// SKP VX
-			chip.skipIfKeyReg(X)
-			// case 0xA1:
+			chip.skipIfKeyPressed(X)
+		case 0xA1:
 			// SKNP VX
+			chip.skipIfKeyNotPressed(X)
+		}
+
+	case 0xF000: // FX
+
+		switch NN {
+
+		case 0x07: // FX07
+			// LD VX, DT
+			chip.storeDelayTime(X)
+
+		case 0x0A: // FX0A
+			// LD VX, K
+			chip.waitKeyPress(X)
+
 		}
 	}
 }
@@ -454,10 +469,37 @@ func (chip *Chip8) drw(X, Y, N uint16) {
 
 // SKP VX
 // if key with value VX is pressed then increment pc
-func (chip *Chip8) skipIfKeyReg(X uint16) {
+func (chip *Chip8) skipIfKeyPressed(X uint16) {
 	if chip.keypad.IsPressed(chip.V[X]) {
 		chip.PC += 2
 	}
 }
 
-//
+// SKNP VX
+// if key with value VX is NOT pressed then increment PC
+func (chip *Chip8) skipIfKeyNotPressed(X uint16) {
+	if !chip.keypad.IsPressed(chip.V[X]) {
+		chip.PC += 2
+	}
+}
+
+// LD VX, DT
+// set VX = DT
+func (chip *Chip8) storeDelayTime(X uint16) {
+	chip.V[X] = chip.DT
+}
+
+// LD VX, K
+// wait for keypress, store value in VX
+func (chip *Chip8) waitKeyPress(X uint16) {
+	// look for any pressed key
+	for i := 0; i < 16; i++ {
+		if chip.keypad.IsPressed(uint8(i)) {
+			chip.V[X] = byte(i)
+			return
+		}
+	}
+
+	// loop until key press
+	chip.PC -= 2
+}
