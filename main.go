@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -12,9 +13,12 @@ import (
 const scale = 20
 
 func main() {
-	chip := NewChip()
+	keypad := &Keypad{}
+	chip := NewChip(keypad)
 
-	rom := filepath.Join("testRoms", "2-ibm-logo.ch8")
+	arg := os.Args[1]
+
+	rom := filepath.Join("testRoms", arg)
 	err := chip.LoadRom(rom)
 	if err != nil {
 		log.Fatal(err)
@@ -38,7 +42,7 @@ func main() {
 		}
 	}()
 
-	display := NewDisplay(chip, scale)
+	display := NewDisplay(chip, scale, keypad)
 
 	ebiten.SetWindowSize(ScreenWidth*scale, ScreenHeight*scale) // x 64, y 32
 	ebiten.SetWindowTitle("Chip8")

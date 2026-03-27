@@ -30,6 +30,17 @@ Then run
 ./chip8 <path-to-rom>
 ```
 
+<summary>Tests Passed</summary>
+
+  - [X] Chip-8 Splash Screen
+  ![Splash Screen](images/chip8-logo.png)
+  - [X] IBM LOGO
+  ![IBM Logo](images/ibm-logo.png)  
+  - [X] CORAX+ opcode test
+  ![Opcode Test](images/corax+.png)
+  - [ ] Flags test
+  - [ ] Quirks test
+  - [ ] Keypad test
 
 ## TODO
 <details>
@@ -42,7 +53,11 @@ Then run
 - [x] Add and Load Fonts
 - [x] Implement Timers
 - [x] Decode Instruction
-- [ ] Implement instructions
+
+<details>
+<summary>Implemented Instructions</summary>
+
+- [x] Implement instructions
   - [x] `00E0` clear screen
   - [x] `00EE` return from subroutine
 
@@ -80,13 +95,14 @@ Then run
 
   - [x] `FX07` set `VX = delay timer`
   - [x] `FX0A` wait for key press, store in `VX`
-  - [ ] `FX15` set delay timer = `VX`
-  - [ ] `FX18` set sound timer = `VX`
-  - [ ] `FX1E` add `VX` to `I`
-  - [ ] `FX29` set `I` to sprite location for digit `VX`
-  - [ ] `FX33` store BCD of `VX` in memory
-  - [ ] `FX55` store registers `V0` to `VX` in memory
-  - [ ] `FX65` load registers `V0` to `VX` from memory
+  - [x] `FX15` set delay timer = `VX`
+  - [x] `FX18` set sound timer = `VX`
+  - [x] `FX1E` add `VX` to `I`
+  - [x] `FX29` set `I` to sprite location for digit `VX`
+  - [x] `FX33` store BCD of `VX` in memory
+  - [x] `FX55` store registers `V0` to `VX` in memory
+  - [x] `FX65` load registers `V0` to `VX` from memory
+  </details>
 </details>
 
 # Resources

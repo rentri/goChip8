@@ -9,9 +9,11 @@ import (
 
 // chip 8 programs start at location 0x200 (512)
 const (
-	startAddress = 0x200
-	ScreenWidth  = 64 // x ScreenWidth
-	ScreenHeight = 32 // y ScreenHeight
+	startAddress     = 0x200
+	ScreenWidth      = 64 // x ScreenWidth
+	ScreenHeight     = 32 // y ScreenHeight
+	fontStartAddress = 0x50
+	fontEndAddress   = 0x9F
 )
 
 type Chip8 struct {
@@ -48,15 +50,17 @@ var chip8Font = [80]byte{
 	0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 }
 
-func NewChip() (chip *Chip8) {
-	chip = &Chip8{}
+func NewChip(keypad *Keypad) (chip *Chip8) {
+	chip = &Chip8{
+		keypad: keypad,
+	}
 	chip.PC = startAddress
 
 	// seed rng with current time , seed is time elapsed since unix posix time
 	chip.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// load fonts
-	copy(chip.memory[0x050:0x09F], chip8Font[:])
+	copy(chip.memory[fontStartAddress:fontEndAddress], chip8Font[:])
 	return
 }
 
@@ -237,6 +241,33 @@ func (chip *Chip8) decodeAndExecute() {
 			// LD VX, K
 			chip.waitKeyPress(X)
 
+		case 0x15: // FX15
+			// LD DT, VX
+			chip.setDelayTime(X)
+
+		case 0x18: // FX18
+			// LD ST, VX
+			chip.setSoundTimer(X)
+
+		case 0x1E: // FX1E
+			// ADD I, VX
+			chip.addToIndex(X)
+
+		case 0x29: // FX29
+			// LD F, VX
+			chip.loadFontToIndex(X)
+
+		case 0x33: // FX33
+			// LD B, VX
+			chip.storeBCD(X)
+
+		case 0x55: // FX55
+			// LD [I], VX
+			chip.storeAllRegToMem(X)
+
+		case 0x65: // FX65
+			// LD VX, [I]
+			chip.loadRegFromMem(X)
 		}
 	}
 }
@@ -502,4 +533,62 @@ func (chip *Chip8) waitKeyPress(X uint16) {
 
 	// loop until key press
 	chip.PC -= 2
+}
+
+// LD DT, VX
+// set DT = VX
+func (chip *Chip8) setDelayTime(X uint16) {
+	chip.DT = chip.V[X]
+}
+
+// LD ST, VX
+// set ST = VX
+func (chip *Chip8) setSoundTimer(X uint16) {
+	chip.ST = chip.V[X]
+}
+
+// ADD I, VX
+// set I = I = VX
+func (chip *Chip8) addToIndex(X uint16) {
+	chip.I += uint16(chip.V[X])
+}
+
+// LD F, VX
+// set I = location of sprite for digit VX
+func (chip *Chip8) loadFontToIndex(X uint16) {
+	// each font character is 5 byte long
+	// we can get address of first byte of any character
+	// by taking offset from start address (0x50)
+	chip.I = fontStartAddress + (5 * uint16(chip.V[X]))
+}
+
+// LD B, VX
+// store BCD representation of VX in memory locations, I, I+1, I+2
+// hundredth digit at I,
+// tens digit at I+1,
+// ones digit at I+2
+func (chip *Chip8) storeBCD(X uint16) {
+	bcd := chip.V[X]
+
+	chip.memory[chip.I+2] = bcd % 10
+	bcd /= 10
+	chip.memory[chip.I+1] = bcd % 10
+	bcd /= 10
+	chip.memory[chip.I] = bcd % 10
+}
+
+// LD [I], VX
+// store V0 to VX in memory starting at location I
+func (chip *Chip8) storeAllRegToMem(X uint16) {
+	for i := uint16(0); i <= X; i++ {
+		chip.memory[chip.I+i] = chip.V[i]
+	}
+}
+
+// LD VX, [I]
+// read register V0 to VX from memory starting at location I
+func (chip *Chip8) loadRegFromMem(X uint16) {
+	for i := uint16(0); i <= X; i++ {
+		chip.V[i] = chip.memory[chip.I+i]
+	}
 }

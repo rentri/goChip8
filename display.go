@@ -7,8 +7,9 @@ import (
 )
 
 type Display struct {
-	chip  *Chip8
-	scale int
+	chip   *Chip8
+	scale  int
+	keypad *Keypad
 }
 
 // keymap for keypad.go
@@ -35,10 +36,11 @@ var keyMap = map[ebiten.Key]uint8{
 	ebiten.KeyV: 0xF,
 }
 
-func NewDisplay(chip *Chip8, scale int) *Display {
+func NewDisplay(chip *Chip8, scale int, keypad *Keypad) *Display {
 	return &Display{
-		chip:  chip,
-		scale: scale,
+		chip:   chip,
+		scale:  scale,
+		keypad: keypad,
 	}
 }
 
