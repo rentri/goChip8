@@ -30,7 +30,7 @@ Then run
 ./chip8 <path-to-rom>
 ```
 
-<summary>Tests Passed</summary>
+## Tests Passed
 
   - [X] Chip-8 Splash Screen
   ![Splash Screen](images/chip8-logo.png)
