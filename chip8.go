@@ -365,13 +365,15 @@ func (chip *Chip8) xorReg(X, Y uint16) {
 // set VX = VX + VY, set VF = carry
 func (chip *Chip8) addReg(X, Y uint16) {
 	sum := uint16(chip.V[X]) + uint16(chip.V[Y])
+
+	// flags test expects setting VX first, then VF
+	chip.V[X] = uint8(sum)
+
 	if sum > 255 {
 		chip.V[0xF] = 1 // carry
 	} else {
 		chip.V[0xF] = 0
 	}
-
-	chip.V[X] = uint8(sum)
 }
 
 // SUB VX, VY
