@@ -379,16 +379,20 @@ func (chip *Chip8) addReg(X, Y uint16) {
 // SUB VX, VY
 // set VX = VX - VY, set VF = !borrow
 func (chip *Chip8) subReg(X, Y uint16) {
-	if chip.V[X] > chip.V[Y] {
+
+	// we are using the byte type which is uint8 under the hood
+	// uint8 IS expected to wrap around if VX - VY goes negative
+	vx := chip.V[X]
+	vy := chip.V[Y]
+
+	// VX is expected to be set before VF
+	chip.V[X] -= chip.V[Y]
+
+	if vx >= vy {
 		chip.V[0xF] = 1
 	} else {
 		chip.V[0xF] = 0 // borrow
 	}
-
-	// we are using the byte type which is uint8 under the hood
-	// uint8 IS expected to wrap around if VX - VY goes negative
-	// VF already set
-	chip.V[X] -= chip.V[Y]
 }
 
 // SHR VX
