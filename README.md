@@ -45,9 +45,9 @@ Then run
   ![Opcode Test](images/corax+.png)
   
   - [X] Flags test
-    > [!NOTE]
-    > Our implementation of SHR and SHL instructions uses modern beavior.
-    > Hence 8XY6 & 8XYE fail the last check.
+  > [!NOTE]
+  > Our implementation of SHR and SHL instructions uses modern beavior.
+  > Hence 8XY6 & 8XYE fail the last check.
   
   ![Flags Test](images/flags.png)
   
