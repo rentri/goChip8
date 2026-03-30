@@ -33,12 +33,24 @@ Then run
 ## Tests Passed
 
   - [X] Chip-8 Splash Screen
+  
   ![Splash Screen](images/chip8-logo.png)
   - [X] IBM LOGO
-  ![IBM Logo](images/ibm-logo.png)  
+  
+  
+  ![IBM Logo](images/ibm-logo.png)
+    
   - [X] CORAX+ opcode test
+  
   ![Opcode Test](images/corax+.png)
-  - [ ] Flags test
+  
+  - [X] Flags test
+    > [!NOTE]
+    > Our implementation of SHR and SHL instructions uses modern beavior.
+    > Hence 8XY6 & 8XYE fail the last check.
+  
+  ![Flags Test](images/flags.png)
+  
   - [ ] Quirks test
   - [ ] Keypad test
 

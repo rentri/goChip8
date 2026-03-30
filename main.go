@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
+	// "path/filepath"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -16,9 +16,9 @@ func main() {
 	keypad := &Keypad{}
 	chip := NewChip(keypad)
 
-	arg := os.Args[1]
+	rom := os.Args[1]
 
-	rom := filepath.Join("testRoms", arg)
+	// rom := filepath.Join("testRoms", arg)
 	err := chip.LoadRom(rom)
 	if err != nil {
 		log.Fatal(err)

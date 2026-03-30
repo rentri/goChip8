@@ -189,7 +189,7 @@ func (chip *Chip8) decodeAndExecute() {
 			chip.subReg(X, Y)
 		case 0x6:
 			// SHR VX
-			chip.shiftRight(X)
+			chip.shiftRight(X, Y)
 		case 0x7:
 			// SUBN VX, VY
 			chip.subNReg(X, Y)
@@ -395,9 +395,32 @@ func (chip *Chip8) subReg(X, Y uint16) {
 	}
 }
 
+// SUBN VX, VY
+// set VX = VY - VX
+func (chip *Chip8) subNReg(X, Y uint16) {
+
+	vy := chip.V[Y]
+	vx := chip.V[X]
+
+	chip.V[X] = vy - vx
+
+	if vy >= vx {
+		chip.V[0xF] = 1
+	} else {
+		chip.V[0xF] = 0
+	}
+}
+
+// In the COSMIC VIP, the SHR and SHL instruction put value of VY
+// in VX then shifted VX by 1 bit
+// however starting with CHIP-48 and SUPER-CHIP these instruction
+// shifted VX and ignored VY completely
+// cowgod's CHIP-8 reference uses the modern behavior
+
+// NOTE: Ambiguous instruction
 // SHR VX
 // division by 2
-func (chip *Chip8) shiftRight(X uint16) {
+func (chip *Chip8) shiftRight(X, Y uint16) {
 	// set VF to LSB of VX
 	chip.V[0xF] = chip.V[X] & 0x1
 
@@ -405,23 +428,12 @@ func (chip *Chip8) shiftRight(X uint16) {
 	chip.V[X] >>= 1
 }
 
-// SUBN VX, VY
-// set VX = VY - VX
-func (chip *Chip8) subNReg(X, Y uint16) {
-	if chip.V[Y] > chip.V[X] {
-		chip.V[0xF] = 1
-	} else {
-		chip.V[0xF] = 0
-	}
-
-	chip.V[X] = chip.V[Y] - chip.V[X]
-}
-
+// NOTE: Ambiguous instruction
 // SHL VX
 // multiplication by 2
 func (chip *Chip8) shiftLeftReg(X uint16) {
 	// set VF to MSB of VX
-	chip.V[0xF] = chip.V[X] & 0x8
+	chip.V[0xF] = (chip.V[X] & 0x80) >> 7
 
 	// multiplication by 2
 	chip.V[X] <<= 1

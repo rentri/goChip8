@@ -54,7 +54,7 @@ func (display *Display) Update() error {
 	}
 	// ebiten runs at 60 fps, cpu cycle will run at 720 (60*12) Hz
 	// roughly 700 instruction per second
-	for i := 0; i < 12; i++ {
+	for i := 0; i < 8; i++ {
 		display.chip.Cycle()
 	}
 	return nil
