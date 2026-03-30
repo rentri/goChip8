@@ -189,7 +189,7 @@ func (chip *Chip8) decodeAndExecute() {
 			chip.subReg(X, Y)
 		case 0x6:
 			// SHR VX
-			chip.shiftRight(X, Y)
+			chip.shiftRight(X)
 		case 0x7:
 			// SUBN VX, VY
 			chip.subNReg(X, Y)
@@ -420,7 +420,7 @@ func (chip *Chip8) subNReg(X, Y uint16) {
 // NOTE: Ambiguous instruction
 // SHR VX
 // division by 2
-func (chip *Chip8) shiftRight(X, Y uint16) {
+func (chip *Chip8) shiftRight(X uint16) {
 	// set VF to LSB of VX
 	chip.V[0xF] = chip.V[X] & 0x1
 
