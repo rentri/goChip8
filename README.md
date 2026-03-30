@@ -117,5 +117,6 @@ Then run
   </details>
 </details>
 
-# Resources
-http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+# Credits 
+- Test ROMs from [Timendus's CHIP-8 Test Suite](https://github.com/Timendus/chip8-test-suite)
+- Reference from [Cowgod's CHIP-8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
