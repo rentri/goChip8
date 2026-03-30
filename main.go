@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	// "path/filepath"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,7 +17,6 @@ func main() {
 
 	rom := os.Args[1]
 
-	// rom := filepath.Join("testRoms", arg)
 	err := chip.LoadRom(rom)
 	if err != nil {
 		log.Fatal(err)
