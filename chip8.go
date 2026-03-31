@@ -17,18 +17,20 @@ const (
 )
 
 type Chip8 struct {
-	memory [4096]byte                       // 4kb memory
-	V      [16]byte                         // registers V0 to VF , VF is flag register and should not be used by any program
-	I      uint16                           // 16 bit memory address register
-	PC     uint16                           // 16 bit pseudo register "program counter"
-	inst   uint16                           // each instruction is 2 bytes long
-	stack  [16]uint16                       // array of 16, 16bit values, upto 16 levels of nested subroutines allowed
-	SP     uint8                            // points to topmost level of stack
-	gfx    [ScreenWidth * ScreenHeight]byte // 64x32 display
-	DT     byte                             // delay timer register
-	ST     byte                             // sound timer register
-	keypad *Keypad                          // keypad has 16 keys
-	rng    *rand.Rand                       // rng for each instance of Chip8 used for CXNN instruction
+	memory     [4096]byte                       // 4kb memory
+	V          [16]byte                         // registers V0 to VF , VF is flag register and should not be used by any program
+	I          uint16                           // 16 bit memory address register
+	PC         uint16                           // 16 bit pseudo register "program counter"
+	inst       uint16                           // each instruction is 2 bytes long
+	stack      [16]uint16                       // array of 16, 16bit values, upto 16 levels of nested subroutines allowed
+	SP         uint8                            // points to topmost level of stack
+	gfx        [ScreenWidth * ScreenHeight]byte // 64x32 display
+	DT         byte                             // delay timer register
+	ST         byte                             // sound timer register
+	keypad     *Keypad                          // keypad has 16 keys
+	rng        *rand.Rand                       // rng for each instance of Chip8 used for CXNN instruction
+	drawFlag   bool                             // when to update the display, true when a pixel is turned on
+	waitForKey uint8                            // 0: wait for all keys to be releases 1: wait for a key press 2: wait for release
 }
 
 var chip8Font = [80]byte{
@@ -55,7 +57,7 @@ func NewChip(keypad *Keypad) (chip *Chip8) {
 		keypad: keypad,
 	}
 	chip.PC = startAddress
-
+	chip.waitForKey = 0
 	// seed rng with current time , seed is time elapsed since unix posix time
 	chip.rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -208,7 +210,9 @@ func (chip *Chip8) decodeAndExecute() {
 
 	case 0xB000: // BNNN
 		// JP V0, addr
-		chip.jpWithOffset(NNN)
+		// QUIRKS: in SUPER-CHIP we use VX
+		// where X is the highest nibble of NNN
+		chip.jpWithOffset(X, NNN)
 
 	case 0xC000: // CXNN
 		// RND VX, byte
@@ -455,8 +459,8 @@ func (chip *Chip8) ldAddr(NNN uint16) {
 
 // JP V0, addr
 // set PC = NNN + V0
-func (chip *Chip8) jpWithOffset(NNN uint16) {
-	chip.PC = uint16(chip.V[0]) + uint16(NNN)
+func (chip *Chip8) jpWithOffset(X, NNN uint16) {
+	chip.PC = uint16(chip.V[X]) + uint16(NNN)
 }
 
 // helper function for mehtod randAndByte
@@ -485,6 +489,9 @@ func (chip *Chip8) drw(X, Y, N uint16) {
 
 	chip.V[0xF] = 0
 
+	// flag to check if any pixel was drawn this instruction
+	drawn := false
+
 	for i := uint16(0); i < N; i++ {
 		spriteNbyte := chip.memory[chip.I+i]
 
@@ -511,9 +518,16 @@ func (chip *Chip8) drw(X, Y, N uint16) {
 
 				// xor sprite into the screen
 				chip.gfx[index] ^= 1
+
+				if chip.gfx[index] == 1 {
+					drawn = true
+				}
 			}
 		}
+		chip.drawFlag = drawn
 	}
+
+	// chip.drawFlag = true
 }
 
 // SKP VX
@@ -541,16 +555,39 @@ func (chip *Chip8) storeDelayTime(X uint16) {
 // LD VX, K
 // wait for keypress, store value in VX
 func (chip *Chip8) waitKeyPress(X uint16) {
-	// look for any pressed key
-	for i := 0; i < 16; i++ {
-		if chip.keypad.IsPressed(uint8(i)) {
-			chip.V[X] = byte(i)
-			return
+	switch chip.waitForKey {
+	case 0: // wait for all keys to be releases
+		// if before encountering this instruction
+		// if any key is pressed wait for it to be released
+		chip.PC -= 2
+		for _, pressed := range chip.keypad.keys {
+			if pressed {
+				return
+			}
 		}
-	}
+		chip.waitForKey = 1
 
-	// loop until key press
-	chip.PC -= 2
+	case 1: // wait for a keypress
+		chip.PC -= 2
+		for i, pressed := range chip.keypad.keys {
+			if pressed {
+				chip.V[X] = byte(i)
+				chip.waitForKey = 2
+				return
+			}
+		}
+
+	case 2: // wait for release
+		for _, pressed := range chip.keypad.keys {
+			if pressed {
+				chip.PC -= 2
+				return // key still pressed
+			}
+		}
+
+		// all keys released
+		chip.waitForKey = 0
+	}
 }
 
 // LD DT, VX
