@@ -51,9 +51,14 @@ Then run
   
   ![Flags Test](images/flags.png)
   
-  - [ ] Quirks test
-  - [ ] Keypad test
+  - [X] Quirks test
 
+  ![Quirks Test](images/quirks.png)
+    
+  - [X] Keypad test
+
+  ![Keypad Test](images/keypad.png)
+  
 ## TODO
 <details>
 
