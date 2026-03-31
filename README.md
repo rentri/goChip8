@@ -61,7 +61,7 @@ Then run
   > If you press a key when the emulator was not checking if it is pressed, you will experience "key miss", where the press won't be registered.
   > The slower the emulation speed the higher chance for it to happen.
   
-    ![Keypad Test](images/keypad.png)
+  ![Keypad Test](images/keypad.png)
  
 ## TODO
 <details>
