@@ -526,8 +526,6 @@ func (chip *Chip8) drw(X, Y, N uint16) {
 		}
 		chip.drawFlag = drawn
 	}
-
-	// chip.drawFlag = true
 }
 
 // SKP VX

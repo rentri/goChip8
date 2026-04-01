@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -23,7 +22,7 @@ func main() {
 	}
 
 	// create a ticker that ticks at 60Hz
-	// run parrallel to our cpu cycle of 700Hz
+	// run parrallel to our cpu cycle of 600Hz
 	go func() {
 		ticker := time.NewTicker(time.Second / 60)
 		defer ticker.Stop()
@@ -35,7 +34,7 @@ func main() {
 
 			if chip.ST > 0 {
 				chip.ST--
-				fmt.Println("BEEP")
+				Beep()
 			}
 		}
 	}()
