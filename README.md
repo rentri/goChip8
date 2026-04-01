@@ -70,7 +70,7 @@ Then run
 - [x] Handle graphics
 - [x] Implement Keypad
   - [ ] Implement Scancodes
-- [ ] Sound Support
+- [X] Sound Support
 - [x] Add and Load Fonts
 - [x] Implement Timers
 - [x] Decode Instruction
