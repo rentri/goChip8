@@ -30,6 +30,13 @@ Then run
 ./chip8 <path-to-rom>
 ```
 
+## Showcase
+
+| **Tetris**<br>![Tetris](images/tetris.gif) | **Breakout**<br>![Breakout](images/breakout.gif) |
+| :---: | :---: |
+| **Space Invaders**<br>![Space Invaders](images/space-invaders.gif) | **Pong**<br>![Pong](images/pong.gif) |
+
+
 ## Tests Passed
 
   - [X] Chip-8 Splash Screen
