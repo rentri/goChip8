@@ -10,17 +10,29 @@ type Display struct {
 	chip   *Chip8
 	scale  int
 	keypad *Keypad
+	menuBar *MenuBar
+	paused bool
 }
 
 func NewDisplay(chip *Chip8, scale int, keypad *Keypad) *Display {
-	return &Display{
+ 	display := &Display{
 		chip:   chip,
 		scale:  scale,
 		keypad: keypad,
 	}
+
+	display.menuBar = NewMenuBar(display)
+	
+	return display
 }
 
 func (display *Display) Update() error {
+	display.menuBar.Update()
+
+	if display.paused {
+		return nil
+	}
+	
 	display.chip.keypad.Update()
 
 	// ebiten runs at 60 fps, cpu cycle will run at 600 (60*10) Hz
@@ -61,8 +73,10 @@ func (display *Display) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
+
+	display.menuBar.Draw(screen)
 }
 
 func (display *Display) Layout(outsideW, outsideH int) (int, int) {
-	return ScreenWidth * display.scale, ScreenHeight * display.scale
+	return ScreenWidth * display.scale, ScreenHeight * display.scale + MenuBarHeight
 }

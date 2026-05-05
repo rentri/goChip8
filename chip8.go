@@ -31,6 +31,7 @@ type Chip8 struct {
 	rng        *rand.Rand                       // rng for each instance of Chip8 used for CXNN instruction
 	drawFlag   bool                             // when to update the display, true when a pixel is turned on
 	waitForKey uint8                            // 0: wait for all keys to be releases 1: wait for a key press 2: wait for release
+	loaded bool                                 // check if rom is loaded
 }
 
 var chip8Font = [80]byte{
@@ -85,10 +86,15 @@ func (chip *Chip8) LoadRom(rom string) error {
 		copy(chip.memory[startAddress:], data)
 	}
 
+	chip.loaded = true
+
 	return nil
 }
 
 func (chip *Chip8) Cycle() {
+	if !chip.loaded {
+		return
+	}
 	chip.fetch()
 	chip.decodeAndExecute()
 }
