@@ -128,7 +128,6 @@ func (menuBar *MenuBar) Update() {
 }
 
 func (menuBar *MenuBar) Draw(screen *ebiten.Image) {
-	// vector.FillRect(screen, 0, 0, float32(ScreenWidth*menuBar.display.scale), MenuBarHeight, color.RGBA{40, 40, 40, 255}, false)
 
 	mx, my := ebiten.CursorPosition()
 
