@@ -30,6 +30,12 @@ Then run
 ./chip8 <path-to-rom>
 ```
 
+or 
+just run and select rom file inside the emulator
+```bash
+./chip8
+```
+
 ## Showcase
 
 | **Tetris**<br>![Tetris](images/tetris.gif) | **Breakout**<br>![Breakout](images/breakout.gif) |
